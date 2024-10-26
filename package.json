@@ -1,0 +1,28 @@
+{
+  "name": "real-time-data-processing-service",
+  "version": "1.0.0",
+  "description": "A service that processes real-time data streams (e.g., IoT sensor data, live financial tickers) using WebSockets or message brokers like Kafka or RabbitMQ. Implements features such as filtering, aggregation, and triggering alerts based on specific conditions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx nodemon",
+    "start": "node dist/server.js",
+    "build": "tsc"
+  },
+  "author": "Miruan Kodra",
+  "license": "ISC",
+  "dependencies": {
+    "@types/websocket": "^1.0.10",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.8.1",
+    "@types/ws": "^8.5.12",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
