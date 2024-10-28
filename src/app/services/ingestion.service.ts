@@ -1,14 +1,15 @@
 import 'dotenv/config';
 import { WebSocket} from 'ws';
+import { TransformatorController } from '../controllers/transformator.controller';
+import { TickerDTO } from '../models/ticker-dto.model';
 
 
-export class Ingester {
+export class IngesterService {
 
     private ws: WebSocket | null = null;
     private websocket_url: string = '';
-    
 
-    constructor(wbs_url: string){
+    constructor(private transformator: TransformatorController, wbs_url: string){
         this.websocket_url = wbs_url;
         this.startIngestion();
     }
@@ -20,9 +21,9 @@ export class Ingester {
             console.log('WebSocket connection established');
         });
 
-        this.ws.on('message', (response: string) => {
-            const data = JSON.parse(response);
-            console.log(`Received message: ${data.s}`);
+        this.ws.on('message', (response: TickerDTO[]) => {
+            console.log('Received data:', response);
+            this.transformator.transformData(response);
         });
 
         this.ws.on('close', () => {
