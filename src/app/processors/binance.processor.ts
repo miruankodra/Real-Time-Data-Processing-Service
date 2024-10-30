@@ -5,44 +5,27 @@ export class BinanceProcessor {
 
     constructor() {}
 
-    public async processTickers(tickerDto: TickerDTO[]): Promise<StreamDto[]> {
-        return await tickerDto.map(ticker => {
-            const openPrice = parseFloat(ticker.o);
-            const currentPrice = parseFloat(ticker.c);
-            const highPrice = parseFloat(ticker.h);
-            const lowPrice = parseFloat(ticker.l);
-            const totalVolume = parseFloat(ticker.v);
-            const totalQuoteVolume = parseFloat(ticker.q);
+    public async processTickers(tickerDto: TickerDTO): Promise<StreamDto> {
 
-            const priceChangePercentage = this.calculatePriceChangePercentage(openPrice, currentPrice);
-            const volatility = this.calculateVolatility(highPrice, lowPrice);
-            const VWAP = this.calculateVWAP(totalVolume, totalQuoteVolume);
-            const aggregatedVolume = this.calculateAggregatedVolume(tickerDto);
+        
+            const price = parseFloat(tickerDto.p);
+            const quantity = parseFloat(tickerDto.q);
+            const tradeImpact = price * quantity;
+            const tradeDirection = tickerDto.m ? 'Sell' : 'Buy';
 
             return {
-                symbol: ticker.s,
-                currentPrice: currentPrice,
-                priceChangePercentage: priceChangePercentage,
-                volatility: volatility,
-                VWAP: VWAP,
-                aggregatedVolume: aggregatedVolume,
+                symbol: tickerDto.s,
+                trade_impact: tradeImpact,
+                trade_direction: tradeDirection,
+                trade_timestamp: this.formatDate(new Date(tickerDto.T)),
             }
-        })
     }
 
-    private calculatePriceChangePercentage(openPrice:number, currentPrice:number): number {
-        return ((currentPrice - openPrice) / openPrice) * 100;
-    }
-
-    private calculateVolatility(highPrice:number, lowPrice:number): number {
-        return highPrice - lowPrice;
-    }
-
-    private calculateVWAP(totalVolume:number, totalQuoteVolume:number): number {
-        return totalQuoteVolume / totalVolume;
-    }
-
-    private calculateAggregatedVolume(tickerDto: TickerDTO[]): number {
-        return tickerDto.reduce((total, ticker) => total + parseFloat(ticker.v), 0);
+    private formatDate(date: Date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const year = date.getFullYear();
+    
+        return `${day}-${month}-${year}`;
     }
 }

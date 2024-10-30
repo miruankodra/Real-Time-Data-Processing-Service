@@ -1,8 +1,6 @@
 export interface StreamDto {
     symbol: string;
-    currentPrice: number;
-    priceChangePercentage: number;
-    volatility: number;
-    VWAP: number;
-    aggregatedVolume: number;
+    trade_impact: number;
+    trade_direction: string;
+    trade_timestamp: string;
  };

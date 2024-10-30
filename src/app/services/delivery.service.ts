@@ -1,4 +1,4 @@
-import { WebSocketServer } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 import { TickerDTO } from "../models/ticker-dto.model";
 import { StreamDto } from "../models/stream-dto.model";
 
@@ -9,7 +9,7 @@ export class DeliveryService {
 
 
     constructor(){
-        this.wss = new WebSocketServer({port: this.port});
+        this.wss = new WebSocketServer({port: this.port, maxPayload: 10 * 1024 * 1024 });
         this.streamData();
     };
 
@@ -42,13 +42,16 @@ export class DeliveryService {
 
     }
 
-    public async broadcastData(streamData: StreamDto[]): Promise<void> {
-        this.wss.clients.forEach(client => {
-            if(client.readyState === WebSocket.OPEN) {
-                const data = JSON.stringify(streamData);
-                client.send(data);
-            }
-        });
+    public async broadcastData(streamData: StreamDto): Promise<void> {
+        if (this.wss){
+            this.wss.clients.forEach(client => {
+                if(WebSocket.OPEN && client.readyState === WebSocket.OPEN) {
+                    const data = JSON.stringify(streamData);
+                    client.send(data);
+                }
+            });
+        }
+        
     }
 
     public async close(): Promise<void> {

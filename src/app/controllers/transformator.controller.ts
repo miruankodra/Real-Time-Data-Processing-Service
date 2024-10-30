@@ -6,8 +6,11 @@ export class TransformatorController {
 
     constructor(private proccessorService: BinanceProcessor, private deliveryService: DeliveryService){}
 
-    public async transformData(tickerDto: TickerDTO[]): Promise<void> {
+    public async transformData(tickerDto: TickerDTO): Promise<void> {
+        // console.log(tickerDto);
+        
         const binanceData = await this.proccessorService.processTickers(tickerDto);
         await this.deliveryService.broadcastData(binanceData);
+        
     }
 }

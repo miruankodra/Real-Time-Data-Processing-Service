@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { WebSocket} from 'ws';
 import { TransformatorController } from '../controllers/transformator.controller';
 import { TickerDTO } from '../models/ticker-dto.model';
+import { BufferDto } from '../models/buffer.model';
 
 
 export class IngesterService {
@@ -21,9 +22,9 @@ export class IngesterService {
             console.log('WebSocket connection established');
         });
 
-        this.ws.on('message', (response: TickerDTO[]) => {
-            console.log('Received data:', response);
-            this.transformator.transformData(response);
+        this.ws.on('message', (response: Buffer) => {
+            const data: TickerDTO = this.bufferToJSON(response);
+            this.transformator.transformData(data);
         });
 
         this.ws.on('close', () => {
@@ -36,10 +37,22 @@ export class IngesterService {
         });
     }
 
+    private async throtleConnection(): Promise<void> {
+        // Implement throttling logic here
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        this.startIngestion();
+    }
+
     public async stopIngestion(): Promise<void> {
         this.ws?.close();
         this.ws = null;
         console.log('WebSocket connection closed');
+    }
+
+    private bufferToJSON(bufferData: Buffer): TickerDTO {
+        const JSONString = Buffer.from(bufferData).toString();
+        return JSON.parse(JSONString);
+
     }
 
 }
